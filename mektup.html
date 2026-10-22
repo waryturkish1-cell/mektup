@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elçin’e</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--ivory:#f6ebdc;--pink:#e8b4c0;--wine:#5a0f23;--ink:#5a1020;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;height:100%;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#2c0c18 0%,#140609 46%,#050304 100%);color:var(--ivory);font-family:"Cormorant Garamond",Georgia,serif}
+.beam{position:fixed;left:50%;top:-10%;width:70vmin;height:120%;transform:translateX(-50%);background:linear-gradient(to bottom,rgba(232,180,192,.16),transparent 75%);clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);filter:blur(22px);animation:beam 9s ease-in-out infinite;pointer-events:none}
+.mist{position:fixed;inset:-20%;background:radial-gradient(40% 25% at 25% 70%,rgba(120,30,55,.18),transparent 70%),radial-gradient(35% 22% at 78% 60%,rgba(232,180,192,.08),transparent 70%);animation:mist 26s ease-in-out infinite alternate;pointer-events:none}
+@keyframes beam{50%{opacity:.55}}
+@keyframes mist{to{transform:translate3d(6%,-4%,0)}}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1;touch-action:manipulation}
+#title{position:fixed;z-index:5;left:5vw;top:calc(env(safe-area-inset-top,0px) + 3.5vh);margin:0;font-weight:300;font-style:italic;font-size:clamp(3.6rem,12vw,9.5rem);line-height:.95;letter-spacing:-.02em;color:rgba(246,235,220,.92);pointer-events:none;text-shadow:0 0 40px rgba(140,30,60,.5)}
+#hud{position:fixed;z-index:5;left:5vw;right:5vw;bottom:calc(env(safe-area-inset-bottom,0px) + 4vh);display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+#hint{font-style:italic;font-size:clamp(1.05rem,2.4vw,1.35rem);color:rgba(246,235,220,.72);transition:color 1s}
+#count{display:block;font-size:2.1rem;font-weight:300;color:var(--pink);letter-spacing:.04em}
+#open{font:inherit;font-size:1.25rem;font-style:italic;color:var(--ivory);background:rgba(90,15,35,.35);border:1px solid rgba(232,180,192,.3);border-radius:999px;padding:.7em 1.5em .7em 1em;display:flex;align-items:center;gap:.8em;cursor:not-allowed;opacity:.35;transition:opacity 1.2s,box-shadow 1.2s,border-color 1.2s,background 1.2s}
+#open:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+#open .dot{width:1.5em;height:1.5em;border-radius:50%;background:radial-gradient(circle at 35% 30%,#b0334f,#6b0f26 60%,#3d0614);box-shadow:inset 0 -2px 3px rgba(0,0,0,.4),inset 0 1px 2px rgba(255,170,190,.4)}
+#open:not(:disabled){opacity:1;cursor:pointer;border-color:rgba(232,180,192,.8);background:rgba(120,25,50,.55);animation:glow 3.2s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 38px rgba(232,150,175,.45)}}
+.halo{position:fixed;z-index:2;left:50%;top:46%;width:min(78vmin,560px);aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%) scale(.6);border:1px solid rgba(246,215,205,.55);box-shadow:0 0 60px rgba(232,170,190,.35),inset 0 0 60px rgba(232,170,190,.18);opacity:0;pointer-events:none}
+.halo.on{animation:halo 2.8s ease-out forwards,haloB 6s 2.8s ease-in-out infinite}
+@keyframes halo{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}40%{opacity:.9}100%{opacity:.4;transform:translate(-50%,-50%) scale(1)}}
+@keyframes haloB{50%{opacity:.2;transform:translate(-50%,-50%) scale(1.04)}}
+body.letter #hud,body.letter #title,body.letter .halo{opacity:0;transition:opacity 1.5s;pointer-events:none}
+#env{position:fixed;inset:0;z-index:10;display:grid;place-items:center;opacity:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(10,3,6,.55),rgba(5,3,4,.9));transition:opacity 1.8s}
+#env.show{opacity:1}
+#env.gone{opacity:0;transition:opacity 1.6s 1s}
+.envelope{position:relative;width:min(86vw,440px);aspect-ratio:1.5;perspective:1400px;transition:transform 1.8s cubic-bezier(.6,0,.3,1),opacity 1.4s;transform:translateY(8vh) scale(.92)}
+#env.show .envelope{transform:none}
+#env.gone .envelope{transform:translateY(38vh) scale(.9);opacity:0}
+.back{position:absolute;inset:0;background:linear-gradient(#4a0b1c,#35071500),#3b0918;border-radius:3px;box-shadow:0 30px 70px rgba(0,0,0,.7)}
+.paper{position:absolute;left:5%;top:4%;width:90%;height:92%;z-index:2;background:#efe3cb repeating-linear-gradient(transparent 0 15px,rgba(90,16,32,.12) 15px 16px);border-radius:2px;box-shadow:0 2px 12px rgba(0,0,0,.5);transition:transform 1.5s cubic-bezier(.3,.1,.2,1)}
+#env.rise .paper{transform:translateY(-58%) rotate(-1deg)}
+.pocket{position:absolute;inset:0;z-index:3;background:linear-gradient(160deg,#6f1229,#4a0b1c 60%,#3a0817);clip-path:polygon(0 0,50% 54%,100% 0,100% 100%,0 100%);border-radius:3px}
+.flap{position:absolute;left:0;top:0;width:100%;height:56%;z-index:4;transform-origin:top center;background:linear-gradient(#7d1730,#5a0f23);clip-path:polygon(0 0,100% 0,50% 100%);transition:transform 1.2s cubic-bezier(.5,0,.2,1),filter 1.2s;filter:drop-shadow(0 6px 6px #000)}
+#env.flap .flap{transform:rotateX(180deg);filter:brightness(.6)}
+.seal{position:absolute;left:50%;top:54%;width:62px;height:62px;margin:-31px 0 0 -31px;z-index:5;border-radius:50%;background:radial-gradient(circle at 35% 30%,#b8374f,#7a1229 55%,#3d0614);box-shadow:0 4px 10px rgba(0,0,0,.65),inset 0 -4px 8px rgba(0,0,0,.45),inset 0 3px 4px rgba(255,170,190,.4);display:grid;place-items:center;font-size:30px;font-style:italic;color:rgba(255,200,210,.55);text-shadow:0 -1px 1px rgba(0,0,0,.6),0 1px 1px rgba(255,170,190,.3);transition:opacity .6s,transform .8s}
+.seal::before{content:"";position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(255,170,190,.3)}
+#env.flap .seal{opacity:0;transform:translateY(-14px) scale(1.25)}
+#letter{position:fixed;inset:0;z-index:12;overflow-y:auto;padding:7vh 4vw calc(9vh + env(safe-area-inset-bottom,0px));opacity:0;pointer-events:none;background:radial-gradient(ellipse at 50% 20%,rgba(30,8,16,.9),rgba(5,3,4,.96));transition:opacity 1.6s}
+#letter.show{opacity:1;pointer-events:auto}
+.sheet{position:relative;max-width:600px;margin:0 auto;padding:clamp(30px,7vw,72px) clamp(24px,6vw,64px);color:var(--ink);background-color:#f0e4cb;
+background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9 .035' numOctaves='3' seed='4'/><feColorMatrix values='0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .18 0 0 0 .28 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='.04' numOctaves='2' seed='9'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .35 0 0 0 0 .2 0 0 0 .16 0'/></filter><rect width='100%' height='100%' filter='url(%23m)'/></svg>");
+box-shadow:0 40px 90px rgba(0,0,0,.75),inset 0 0 80px rgba(130,85,35,.32),inset 0 0 12px rgba(100,60,25,.4);border-radius:2px 4px 3px 2px/3px 2px 4px 3px;transform:scale(.94) translateY(6vh);transition:transform 2.4s cubic-bezier(.2,.7,.2,1)}
+#letter.show .sheet{transform:none}
+.sheet p{margin:0 0 1.15em;font-size:clamp(1.18rem,2.9vw,1.38rem);line-height:1.72;opacity:0;text-wrap:pretty}
+.sheet p.hi{font-size:clamp(1.6rem,4vw,2rem);font-style:italic;margin-bottom:.8em}
+.sheet p.sig{font-family:"Pinyon Script","Snell Roundhand",cursive;font-size:clamp(2rem,6vw,2.8rem);text-align:right;margin:1.4em 0 0;color:#6a0f26;transform:rotate(-2deg)}
+#letter.show .sheet p{animation:ink 2s ease forwards;animation-delay:calc(2.2s + var(--i)*.45s)}
+@keyframes ink{from{opacity:0;filter:blur(3px)}to{opacity:.94;filter:none}}
+@media (prefers-reduced-motion:reduce){.beam,.mist,#open:not(:disabled){animation:none}}
+</style>
+</head>
+<body>
+<div class="beam"></div><div class="mist"></div>
+<canvas id="c"></canvas>
+<div class="halo" id="halo"></div>
+<h1 id="title">Elçinim</h1>
+<div id="hud">
+  <div><span id="hint">Bir yaprağa dokun.</span><span id="count">0 / 6</span></div>
+  <button id="open" disabled aria-label="Mektubu Aç"><span class="dot"></span>Mektubu Aç</button>
+</div>
+
+<div id="env">
+  <div class="envelope">
+    <div class="back"></div>
+    <div class="paper"></div>
+    <div class="pocket"></div>
+    <div class="flap" id="flap"></div>
+    <div class="seal">E</div>
+  </div>
+</div>
+
+<div id="letter">
+  <div class="sheet">
+    <p class="hi" style="--i:0">Zambağım,</p>
+    <p style="--i:1">Bazen gecenin en karanlık saatlerinde insanın aklına bir soru düşer ve ne kadar uzağa kaçarsa kaçsın, dönüp dolaşıp aynı yerde bulur kendini. Benim aklım da son zamanlarda hep aynı sorunun etrafında dönüyor: Bir insan, en çok sevdiği kişinin kalbinde nasıl hem yuva hem de korku hâline gelebilir?</p>
+    <p style="--i:2">Sana bunu yazarken kendimi haklı çıkarmaya çalışmayacağım. Çünkü seni ne kadar sevdiğimi anlatmak, sana yaşattığım şeylerin üzerini örtemez. Bir kalbe ne kadar derinden bağlandığını söylemek kolaydır; o kalbin içinde nasıl bir iz bıraktığını görebilmekse insanın kendisiyle yüzleşmesini gerektirir.</p>
+    <p style="--i:3">Ben seninle yalnızca güzel günleri paylaşmak istemedim. Seninle hayatın içinden geçmek, bir gün bugünkü hâlimize dönüp bakmak, birlikte büyüdüğümüzü görmek istedim. Belki de bazen bu isteğime o kadar tutundum ki seni anlamam gereken yerde korkularımla hareket ettim. Kaybetmekten korktuğum şeyi, kendi ellerimle yorabileceğimi yeterince göremedim.</p>
+    <p style="--i:4">Ve şimdi seni düşündüğümde, yalnızca bana nasıl baktığını değil, benim yanımda neler hissettiğini de düşünüyorum. Acaba yine bir şey olduğunda kendimi anlatmak zorunda mı kalacağım diye mi düşünüyorsun? Acaba bugün iyi olan şeyler yarın yeniden canını yakar mı diye mi korkuyorsun? Bir gün benimle bir hayat kurarsan, bugün seni yoran şeylerin o hayatın içinde de peşinden geleceğinden mi endişeleniyorsun?</p>
+    <p style="--i:5">Bunların cevabını senin yerine veremem. İçinden geçenleri tamamen bildiğimi de iddia edemem. Ama korkularını duymaya hazırım. Beni kaybetmek istemediğin için değil, kendini kaybetmekten korktuğun için de tereddüt edebileceğini anlamak istiyorum.</p>
+    <p style="--i:6">Sana bir şey söylemek istiyorum: Ben senin sesini kısmak, neşeni ölçmek, heyecanını kendine saklamanı gerektiren biri olmak istemiyorum. Sen bazen bir şeyi anlatırken gözlerinin parlamasını, bir şeye çocuk gibi sevinmeni, kendi dünyana dalmanı seviyorum. Bunları sevdiğimi söylerken, zorlandığım anlarda da aynı özgürlüğü sana tanıyabilmem gerekirdi. Seni olduğun hâlinle sevmek, yalnızca hoşuma giden yanlarını sevmek değildir. Bunu anlamam gereken yerlerde seni incittiysem, bunun sorumluluğunu alıyorum.</p>
+    <p style="--i:7">Benim de korkularım, kırgınlıklarım, içimde büyüttüğüm sorularım var. Ama seni seviyorsam bunları sana bir yük gibi bırakmak yerine, seninle konuşmayı öğrenmeliyim. Korktuğumda seni sorgulamakla, kırıldığımda seni cezalandırmakla, kaybetmekten çekindiğimde seni daha sıkı tutmaya çalışmakla güven inşa edemem. Bunu artık yalnızca bir düşünce olarak değil, değiştirmem gereken bir davranış olarak görüyorum.</p>
+    <p style="--i:8">Senden gözlerini kapatıp bana inanmanı istemiyorum. Bana güvenmek zorunda değilsin. Güven, birinin güzel konuşmasına teslim edilen bir şey değil; insanın zaman içinde gördükleriyle yeniden karar verdiği bir şey. Benim sana verebileceğim en dürüst cevap, bir daha asla hata yapmayacağımı söylemek değil. Hata yaptığımda kendimi haklı çıkarmaya sığınmamak, seni dinlemek, öfkemi sana karşı bir silaha çevirmemek ve değişmem gereken şeylerin sorumluluğunu almaktır.</p>
+    <p style="--i:9">Çünkü ben seninle yalnızca bugün yan yana olmayı değil, yarın da yan yana durabilecek iki insan olmayı istiyorum. Bir gün hayat zorlaştığında birbirimizin karşısına geçmek yerine aynı tarafa bakabilmeyi… Birbirimizi kaybetme korkusuyla değil, birbirimizin yanında kendimiz olabildiğimiz için kalmayı… Sevgimizin bir sınava, her tartışmanın geleceğimiz hakkında verilmiş bir hükme dönüşmediği bir hayatı istiyorum.</p>
+    <p style="--i:10">Bazen sana bakınca içimde tuhaf bir his beliriyor. Sanki dünya bütün sertliğiyle üzerimize gelirken, ben yine de seninle kurulabilecek küçük bir hayatı düşünebiliyorum. Büyük sözlerin, kusursuz insanların, hiç kırılmayan kalplerin olduğu bir hayat değil bu. Birbirini incittiğinde bunu inkâr etmeyen, korktuğunda kaçmak ya da saldırmak yerine konuşmayı öğrenen, her şeye rağmen birbirine yeniden yaklaşmanın yolunu arayan iki insanın hayatı.</p>
+    <p style="--i:11">Ben o hayatı istiyorum, Elçin. Ama yalnızca istemenin yetmediğini de biliyorum.</p>
+    <p style="--i:12">Sana geleceği garanti edemem. Geçmişteki bütün kırgınlıklarını bir gecede silemem. İçindeki bütün şüpheleri tek bir mektupla susturamam. Sana verebileceğim şey, bunları susturmanı beklemeden yanında durmaya çalışmak ve sevgimi yalnızca kelimelerimin karanlığında değil, gündelik hayatın en sıradan anlarında da göstermek.</p>
+    <p style="--i:13">Belki bir gün geriye dönüp bugünlere baktığımızda, buranın hikâyemizin en güzel yeri olduğunu söylemeyeceğiz. Belki burası, birbirimizi sevmenin yanında birbirimize nasıl davranmamız gerektiğini de öğrenmek zorunda kaldığımız yer olacak. Ama ben, eğer ikimiz de istersek, buranın sonumuz olmak zorunda olmadığına inanmak istiyorum.</p>
+    <p style="--i:14">Çünkü benim için sen yalnızca kaybetmekten korktuğum biri değilsin. Sen, yanında daha iyi bir insan olmayı öğrenmek istediğim kişisin. Ve bu cümle, seni değiştirmek istediğim anlamına gelmiyor. Tam tersine, seni olduğun kişiden eksiltmeden sevebilecek biri olmayı öğrenmek istiyorum.</p>
+    <p style="--i:15">Bir gün yine geleceğimizi düşündüğünde içinde yalnızca soru işaretleri değil, biraz olsun huzur da oluşsun isterim. Benim yanımda kendini savunmak zorunda kalmayacağını, sesini saklamayacağını, sevgimin içinde küçülmeyeceğini zamanla hissedebilmeni isterim.</p>
+    <p style="--i:16">Seni ikna etmek için değil, bunu hak edebilmek için…</p>
+    <p style="--i:17">Ve ne olursa olsun, bu hikâyenin içinde güzel olan şeyleri inkâr etmek istemiyorum. Birlikte güldüğümüz anları, birbirimize açtığımız dünyaları, yalnızca ikimizin anlayabildiği o küçük şeyleri… Hepsi benim için gerçekti. Şimdi de gerçek. Ben o güzellikleri, korkularımızın gölgesinde kaybetmek değil; onlara layık olmayı öğrenmek istiyorum.</p>
+    <p style="--i:18">Eğer bir gün yeniden aynı geleceğe bakabilirsek, umarım bunu birbirimizi kaybetme korkusuyla değil, birbirimizin yanında kalmayı gerçekten seçtiğimiz için yaparız.</p>
+    <p style="--i:19">Benim dileğim bu, güzel kız.</p>
+    <p style="--i:20">Karanlığın içinden sana ulaşmaya çalışan bütün kelimelerimin sonunda, sana bırakmak istediğim şey korku değil. Biraz huzur, biraz güven ve henüz yazılmamış günlerimize dair küçük ama inatçı bir umut.</p>
+    <p style="--i:21">Seni seviyorum.</p>
+    <p style="--i:22">Ve bu kez, sevgimin yalnızca ne kadar derin olduğunu değil, sana nasıl hissettirdiğini de öğrenmek istiyorum.</p>
+    <p class="sig" style="--i:23">— S.</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+var canvas=document.getElementById('c');
+var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
+renderer.setClearColor(0x000000,0);
+var scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x0a0508,0.04);
+var camera=new THREE.PerspectiveCamera(36,1,0.1,60);
+
+// lights
+var ambient=new THREE.AmbientLight(0x2a1520,0.5);scene.add(ambient);
+var key=new THREE.PointLight(0xffd6c0,2,40);scene.add(key);
+var rim=new THREE.PointLight(0x9a1c3c,2.4,40);rim.position.set(-3.5,2.5,-3.5);scene.add(rim);
+var fill=new THREE.PointLight(0xe8b4c4,0.3,40);fill.position.set(3,0.5,5);scene.add(fill);
+
+var plant=new THREE.Group();scene.add(plant);
+var head=new THREE.Group();plant.add(head);
+
+// stem + leaves
+var stemMat=new THREE.MeshStandardMaterial({color:0x0b140e,roughness:.6});
+var curve=new THREE.CatmullRomCurve3([new THREE.Vector3(.15,-4.6,0),new THREE.Vector3(-.12,-3.2,.05),new THREE.Vector3(.1,-1.6,0),new THREE.Vector3(0,0,0)]);
+plant.add(new THREE.Mesh(new THREE.TubeGeometry(curve,40,0.055,8,false),stemMat));
+
+function petalGeo(len,wid,cup,curl){
+  var g=new THREE.PlaneGeometry(1,1,8,18),p=g.attributes.position,vs=[];
+  for(var i=0;i<p.count;i++){
+    var u=p.getX(i)+.5,v=p.getY(i)+.5,e=(u-.5)*2;
+    var s=Math.pow(Math.sin(Math.PI*Math.pow(v,.8)),.7),w=wid*(s+.1*(1-v));
+    var x=e*w,y=v*len;
+    var z=-cup*w*e*e*.6+curl*len*v*v*.55+.03*wid*Math.sin(v*22+u*5)*Math.abs(e)*v-.06*w*(1-Math.abs(e));
+    p.setXYZ(i,x,y,z);vs.push(v);
+  }
+  g.computeVertexNormals();
+  g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(p.count*3),3));
+  g.userData.v=vs;return g;
+}
+var leafMat=new THREE.MeshStandardMaterial({color:0x0f1d14,roughness:.55,side:THREE.DoubleSide});
+[[-1.9,.9,-.5],[-3.0,-.8,.45]].forEach(function(a){
+  var l=new THREE.Mesh(petalGeo(1.9,.2,.2,.5),leafMat);
+  l.position.set(0,a[0],0);l.rotation.set(a[1]*0.9,a[2]*3,0,'YXZ');
+  l.rotation.order='YXZ';l.rotation.y=a[2]*4;l.rotation.x=.9;plant.add(l);
+});
+
+// petals
+var stops=[[.03,.02,.035],[.36,.06,.14],[.91,.69,.75],[.97,.93,.86]];
+function ramp(t,o){t=Math.max(0,Math.min(1,t))*3;var i=Math.min(2,Math.floor(t)),f=t-i,a=stops[i],b=stops[i+1];
+  o[0]=a[0]+(b[0]-a[0])*f;o[1]=a[1]+(b[1]-a[1])*f;o[2]=a[2]+(b[2]-a[2])*f;}
+var P=[],meshes=[],col=[0,0,0];
+for(var i=0;i<6;i++){
+  var outer=i%2===0;
+  var geo=petalGeo(outer?2.7:2.5,outer?.62:.7,outer?.7:.9,outer?1.0:.8);
+  var mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.38,metalness:.05,side:THREE.DoubleSide,transparent:true,opacity:.96});
+  var mesh=new THREE.Mesh(geo,mat);
+  var grp=new THREE.Group();grp.rotation.order='YXZ';grp.rotation.y=i*Math.PI/3;grp.add(mesh);head.add(grp);
+  var q={mesh:mesh,grp:grp,p:0,wave:-1,active:false,settled:false,dirty:true,open:outer?.62:.38,i:i};
+  mesh.userData.q=q;P.push(q);meshes.push(mesh);
+}
+function recolor(q){
+  var c=q.mesh.geometry.attributes.color,vs=q.mesh.geometry.userData.v,e=q.p*q.p*(3-2*q.p);
+  for(var k=0;k<vs.length;k++){
+    var v=vs[k];ramp(e*(.82+.22*v),col);
+    if(q.wave>=0){var g=Math.max(0,1-Math.abs(v-q.wave)/.2)*(1-Math.min(1,q.wave));g*=.7;col[0]+=g;col[1]+=g*.75;col[2]+=g*.7;}
+    c.setXYZ(k,col[0],col[1],col[2]);
+  }
+  c.needsUpdate=true;q.dirty=false;
+}
+P.forEach(recolor);
+
+// stamens + pistil
+var anthMat=new THREE.MeshStandardMaterial({color:0x120a0c,roughness:.5});
+var fil=new THREE.MeshStandardMaterial({color:0x1a1013,roughness:.6});
+var stamens=[];
+for(i=0;i<6;i++){
+  var sg=new THREE.Group();sg.rotation.order='YXZ';sg.rotation.y=i*Math.PI/3+.5;sg.rotation.x=.16+.04*(i%2);
+  var f=new THREE.Mesh(new THREE.CylinderGeometry(.012,.014,1.7,6),fil);f.position.y=.85;sg.add(f);
+  var an=new THREE.Mesh(new THREE.SphereGeometry(.05,10,8),anthMat);an.scale.set(1,3.2,1);an.position.y=1.75;sg.add(an);
+  head.add(sg);stamens.push(sg);
+}
+var pist=new THREE.Mesh(new THREE.CylinderGeometry(.016,.02,2,6),fil);pist.position.y=1.0;pist.rotation.x=.08;head.add(pist);
+var stig=new THREE.Mesh(new THREE.SphereGeometry(.06,10,8),fil);stig.position.set(0,2.05,.08);head.add(stig);
+
+// particles
+var N=180,pp=new Float32Array(N*3),pv=new Float32Array(N);
+for(i=0;i<N;i++){pp[i*3]=(Math.random()-.5)*10;pp[i*3+1]=Math.random()*8-4;pp[i*3+2]=(Math.random()-.5)*7;pv[i]=.05+Math.random()*.12;}
+var pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+var sc=document.createElement('canvas');sc.width=sc.height=64;var sx=sc.getContext('2d'),gr=sx.createRadialGradient(32,32,0,32,32,32);
+gr.addColorStop(0,'rgba(255,230,230,1)');gr.addColorStop(.4,'rgba(255,190,205,.35)');gr.addColorStop(1,'rgba(255,190,205,0)');sx.fillStyle=gr;sx.fillRect(0,0,64,64);
+var dust=new THREE.Points(pg,new THREE.PointsMaterial({size:.14,map:new THREE.CanvasTexture(sc),transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false,color:0xf0b8c8}));
+scene.add(dust);
+
+// state
+var hint=document.getElementById('hint'),count=document.getElementById('count'),btn=document.getElementById('open'),halo=document.getElementById('halo');
+var clicked=0,allDone=false,bloom=0,rec=0,recT=0,T=0,camR=9.5;
+var ray=new THREE.Raycaster(),mouse=new THREE.Vector2();
+function pick(e){var r=canvas.getBoundingClientRect();mouse.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);
+  ray.setFromCamera(mouse,camera);var h=ray.intersectObjects(meshes,false);return h.length?h[0].object.userData.q:null;}
+canvas.addEventListener('pointerdown',function(e){
+  if(recT)return;var q=pick(e);if(!q||q.active||q.p>0)return;
+  q.active=true;q.wave=0;clicked++;count.textContent=clicked+' / 6';
+  if(clicked<6)hint.textContent='Devam et. '+(6-clicked)+' yaprak kaldı.';
+  else hint.textContent='Her yaprak açıldı.';
+});
+canvas.addEventListener('pointermove',function(e){if(!recT)canvas.style.cursor=pick(e)&&e.pointerType==='mouse'?'pointer':'default';});
+
+btn.addEventListener('click',function(){
+  if(!allDone)return;
+  var env=document.getElementById('env'),flap=document.getElementById('flap');
+  recT=1;document.body.classList.add('letter');env.classList.add('show');
+  setTimeout(function(){env.classList.add('flap');},1900);
+  setTimeout(function(){flap.style.zIndex=0;},2500);
+  setTimeout(function(){env.classList.add('rise');},3300);
+  setTimeout(function(){env.classList.add('gone');document.getElementById('letter').classList.add('show');},5600);
+});
+
+function resize(){
+  var w=window.innerWidth,h=window.innerHeight;renderer.setSize(w,h,false);
+  camera.aspect=w/h;camera.updateProjectionMatrix();camR=Math.max(9.5,4.6/(0.65*camera.aspect));
+}
+window.addEventListener('resize',resize);resize();
+
+var clock=new THREE.Clock(),tmp=new THREE.Color(),warm=[.95,.55,.3];
+function frame(){
+  requestAnimationFrame(frame);
+  var dt=Math.min(clock.getDelta(),.05);T+=dt;
+  var sum=0,fin=true;
+  P.forEach(function(q){
+    if(q.active){q.p=Math.min(1,q.p+dt/3.8);q.wave+=dt/1.5;q.dirty=true;
+      if(q.p>=1&&q.wave>1.3){q.active=false;q.wave=-1;q.settled=true;}}
+    if(q.dirty)recolor(q);
+    if(!q.settled)fin=false;
+    sum+=q.p*q.p*(3-2*q.p);
+  });
+  var warmth=sum/6;
+  if(fin&&!allDone){allDone=true;btn.disabled=false;halo.classList.add('on');}
+  bloom+=((allDone?1:0)-bloom)*dt*.6;
+  // petals breathe / open
+  P.forEach(function(q){
+    q.grp.rotation.x=q.open+.07*Math.sin(T*.7+q.i*1.3)+warmth*.1+bloom*.22;
+  });
+  var br=1+.018*Math.sin(T*.8);head.scale.set(br,br,br);
+  plant.rotation.z=Math.sin(T*.5)*.028;plant.rotation.x=Math.sin(T*.37)*.015;
+  stamens.forEach(function(s,k){s.rotation.x=.16+.04*(k%2)+.05*Math.sin(T*.9+k)+bloom*.08;});
+  tmp.setRGB(.07+.68*warmth,.04+.4*warmth,.05+.2*warmth);anthMat.color.copy(tmp);
+  stemMat.color.setRGB(.04+.03*warmth,.08+.1*warmth,.05+.05*warmth);
+  leafMat.color.setRGB(.05+.05*warmth,.11+.14*warmth,.07+.07*warmth);
+  // lights
+  key.position.set(Math.sin(T*.35)*4.2,1.8+Math.sin(T*.5)*.8,Math.cos(T*.35)*4.2);
+  key.intensity=1.5+warmth*1.8+bloom*.5;fill.intensity=.3+warmth*1.3;rim.intensity=2.4+warmth*.8;
+  key.color.setRGB(1,.84-.04*warmth,.75+.05*warmth);
+  ambient.intensity=.5+warmth*.5;
+  // recede
+  rec+=(recT-rec)*dt*1.1;
+  plant.scale.setScalar(1-.5*rec);plant.position.y=-.6-.8*rec;
+  // camera
+  var a=Math.sin(T*.1)*.24;
+  camera.position.set(Math.sin(a)*camR,.3+Math.sin(T*.2)*.12,Math.cos(a)*camR);camera.lookAt(0,.2,0);
+  // dust
+  var pa=pg.attributes.position;
+  for(var i=0;i<N;i++){var y=pa.getY(i)+pv[i]*dt;if(y>4.5)y=-4;pa.setY(i,y);pa.setX(i,pa.getX(i)+Math.sin(T*.3+i)*.002);}
+  pa.needsUpdate=true;
+  renderer.render(scene,camera);
+}
+frame();
+})();
+</script>
+</body>
+</html>
